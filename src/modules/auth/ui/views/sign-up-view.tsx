@@ -4,6 +4,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form"
 import { OctagonAlertIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FaGithub, FaGoogle } from "react-icons/fa"
 
 import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client";
@@ -58,11 +59,31 @@ const onSubmit = (data: z.infer<typeof formSchema>) => {
         name: data.name,
         email: data.email,
         password: data.password,
+        callbackURL: "/",
       },
       {
         onSuccess: () => {
             setPending(false);
-          router.push("/");
+            router.push("/");
+        },
+        onError: ({error}) => {
+          setError(error.message);
+        },
+      }
+    );
+  };
+
+  const onSocial = (provider: "github" | "google") => {
+    setError(null);
+    setPending(true);
+    authClient.signIn.social(
+    {
+        provider: provider,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
+            setPending(false);
         },
         onError: ({error}) => {
           setError(error.message);
@@ -72,7 +93,7 @@ const onSubmit = (data: z.infer<typeof formSchema>) => {
   };
     return (
         <div className="flex flex-col gap-6">
-       <Card className="overflow-hidden p-0">
+    <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
             <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 md:p-8">
@@ -174,19 +195,21 @@ const onSubmit = (data: z.infer<typeof formSchema>) => {
                     <div className="grid grid-cols-2 gap-4">
                         <Button
                         disabled={pending}
+                        onClick={() => onSocial("google")}
                         variant="outline"
                         type="button"
                         className="full-w"
                         >
-                            Google
+                            <FaGoogle />
                         </Button>
                         <Button
                         disabled={pending}
+                        onClick={() => onSocial("github")}
                         variant="outline"
                         type="button"
                         className="full-w"
                         >
-                            GitHub
+                            <FaGithub />
                         </Button>
                     </div>
                     <div className="text-center text-sm">
@@ -217,7 +240,4 @@ const onSubmit = (data: z.infer<typeof formSchema>) => {
     )
 }
 
-function refine(arg0: (data: any) => boolean, arg1: { message: string; path: string[]; }) {
-    throw new Error("Function not implemented.");
-}
 
