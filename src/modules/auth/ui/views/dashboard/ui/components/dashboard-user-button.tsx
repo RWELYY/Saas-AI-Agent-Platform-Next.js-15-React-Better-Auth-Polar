@@ -1,3 +1,5 @@
+"use client";
+
 import { authClient } from "@/lib/auth-client";
 import {
   DropdownMenu,
@@ -8,12 +10,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage } from "@/components/ui/avatar"; 
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { GeneratedAvatar } from "@/components/ui/generated-avatar";
 import { ChevronDownIcon, CreditCardIcon, LogOutIcon } from "lucide-react";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
-
 import {
   Drawer,
   DrawerContent,
@@ -22,23 +23,26 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
-
+} from "@/components/ui/drawer";
 
 export const DashboardUserButton = () => {
-    const { data, isPending } = authClient.useSession();
-    const isMobile = useIsMobile();
+  // ✅ كل الـ hooks فوق، بدون أي شرط
+  const router = useRouter();
+  const isMobile = useIsMobile();
+  const { data, isPending } = authClient.useSession();
+
+  // ❌ الشرط بعد الـ hooks
   if (isPending || !data?.user) return null;
 
-  const onLogout = () =>  {
+  const onLogout = () => {
     authClient.signOut({
-        fetchOptions: {
-            onSuccess: () => {
-                Router.push("/sign-in");
-            }
-        }
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/sign-in");
+        },
+      },
     });
-  }
+  };
 
   if (isMobile) {
   return (
